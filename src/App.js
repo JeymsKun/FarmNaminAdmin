@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
@@ -10,7 +10,7 @@ import Profile from "./pages/Profile";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<Navigate replace to="/Login/" />} />
         <Route path="/Login/" element={<Login />} />
@@ -18,10 +18,10 @@ function App() {
         <Route path="/Dashboard/Home/" element={<Home />} />
         <Route path="/Dashboard/Settings/" element={<Settings />} />
         <Route path="/Dashboard/Graphs/" element={<Graphs />} />
-        <Route path="/Dashboard/Users/" element={<Users />}/>
+        <Route path="/Dashboard/Users/" element={<Users />} />
         <Route path="/Profile/" element={<Profile />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
