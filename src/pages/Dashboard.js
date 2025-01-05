@@ -1,46 +1,47 @@
-import React, { useState } from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import MuiAppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import DescriptionIcon from '@mui/icons-material/Description';
+import EmailIcon from '@mui/icons-material/Email';
+import ExpandLess from '@mui/icons-material/ExpandLess';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import HomeIcon from '@mui/icons-material/Home';
+import MenuIcon from '@mui/icons-material/Menu';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import PeopleIcon from '@mui/icons-material/People';
+import ReportIcon from '@mui/icons-material/Report';
+import SettingsIcon from '@mui/icons-material/Settings';
+import UpdateIcon from '@mui/icons-material/Update';
+import MuiAppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
+import CssBaseline from '@mui/material/CssBaseline';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import HomeIcon from '@mui/icons-material/Home';
-import SettingsIcon from '@mui/icons-material/Settings';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import PeopleIcon from '@mui/icons-material/People';
-import ReportIcon from '@mui/icons-material/Report';
-import UpdateIcon from '@mui/icons-material/Update';
 import ListItemText from '@mui/material/ListItemText';
-import Collapse from '@mui/material/Collapse';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import Popover from '@mui/material/Popover';
 import MenuItem from '@mui/material/MenuItem';
-import Home from './Home';
-import Settings from './Settings';
-import Graphs from './Graphs';
-import Users from './Users';
-import Reports from './Reports';
+import Popover from '@mui/material/Popover';
+import { styled, useTheme } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../backend/supabaseClient';
 import officialLogo from '../img/official_logo.png';
-import Forms from './Forms';
 import Emails from './Emails';
-import DescriptionIcon from '@mui/icons-material/Description';
-import EmailIcon from '@mui/icons-material/Email';
+import Forms from './Forms';
+import Graphs from './Graphs';
+import Home from './Home';
 import Profile from './Profile';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
+import Reports from './Reports';
+import Settings from './Settings';
+import Users from './Users';
 
 const drawerWidth = 240;
 
@@ -92,6 +93,22 @@ const Dashboard = () => {
     const [activeSection, setActiveSection] = useState('Home');
     const [updatesOpen, setUpdatesOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [userData, setUserData] = useState(null);
+
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            try {
+                const { data, error } = await supabase.auth.getUser();
+                if (error) throw error;
+
+                setUserData(data);
+            } catch (error) {
+                console.error('Error fetching user profile:', error.message);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -141,7 +158,7 @@ const Dashboard = () => {
                     )}
                     <Box sx={{ flexGrow: 1 }} />
                     <Typography variant="body1" noWrap component="div" sx={{ marginRight: '20px' }}>
-                        Default User
+                        {userData?.user?.email || 'Default User'}
                     </Typography>
                     <IconButton color="inherit">
                         <NotificationsIcon />
@@ -178,40 +195,40 @@ const Dashboard = () => {
                 </DrawerHeader>
                 <Divider />
                 <List>
-                {[
-                    { text: 'Home', icon: <HomeIcon /> },
-                    { text: 'Profile', icon: <AccountCircle /> },
-                    { text: 'Users', icon: <PeopleIcon /> },
-                    { text: 'Graphs', icon: <BarChartIcon /> },
-                    { text: 'Reports', icon: <ReportIcon /> },
-                    { text: 'Updates', icon: <UpdateIcon />, expandable: true },
-                    { text: 'Settings', icon: <SettingsIcon /> },
-                ].map((item) => (
-                    <React.Fragment key={item.text}>
-                        <ListItem disablePadding>
-                            <ListItemButton onClick={() => handleMenuClick(item.text)}>
-                                <ListItemIcon>{item.icon}</ListItemIcon>
-                                <ListItemText primary={item.text} />
-                                {item.expandable ? (updatesOpen ? <ExpandLess /> : <ExpandMore />) : null}
-                            </ListItemButton>
-                        </ListItem>
-                        {item.text === 'Updates' && (
-                            <Collapse in={updatesOpen} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    <ListItemButton sx={{ pl: 4 }} onClick={() => setActiveSection('Forms')}>
-                                        <ListItemIcon><DescriptionIcon /></ListItemIcon>
-                                        <ListItemText primary="Forms" />
-                                    </ListItemButton>
-                                    <ListItemButton sx={{ pl: 4 }} onClick={() => setActiveSection('Emails')}>
-                                        <ListItemIcon><EmailIcon /></ListItemIcon>
-                                        <ListItemText primary="Emails" />
-                                    </ListItemButton>
-                                </List>
-                            </Collapse>
-                        )}
-                    </React.Fragment>
-                ))}
-            </List>
+                    {[
+                        { text: 'Home', icon: <HomeIcon /> },
+                        { text: 'Profile', icon: <AccountCircle /> },
+                        { text: 'Users', icon: <PeopleIcon /> },
+                        { text: 'Graphs', icon: <BarChartIcon /> },
+                        { text: 'Reports', icon: <ReportIcon /> },
+                        { text: 'Updates', icon: <UpdateIcon />, expandable: true },
+                        { text: 'Settings', icon: <SettingsIcon /> },
+                    ].map((item) => (
+                        <React.Fragment key={item.text}>
+                            <ListItem disablePadding>
+                                <ListItemButton onClick={() => handleMenuClick(item.text)}>
+                                    <ListItemIcon>{item.icon}</ListItemIcon>
+                                    <ListItemText primary={item.text} />
+                                    {item.expandable ? (updatesOpen ? <ExpandLess /> : <ExpandMore />) : null}
+                                </ListItemButton>
+                            </ListItem>
+                            {item.text === 'Updates' && (
+                                <Collapse in={updatesOpen} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        <ListItemButton sx={{ pl: 4 }} onClick={() => setActiveSection('Forms')}>
+                                            <ListItemIcon><DescriptionIcon /></ListItemIcon>
+                                            <ListItemText primary="Forms" />
+                                        </ListItemButton>
+                                        <ListItemButton sx={{ pl: 4 }} onClick={() => setActiveSection('Emails')}>
+                                            <ListItemIcon><EmailIcon /></ListItemIcon>
+                                            <ListItemText primary="Emails" />
+                                        </ListItemButton>
+                                    </List>
+                                </Collapse>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </List>
             </Drawer>
             <Main open={open}>
                 <DrawerHeader />
